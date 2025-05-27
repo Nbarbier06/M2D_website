@@ -7,6 +7,7 @@ The `widget/` folder includes:
 - `index.html` – main page showcasing the catalogue
 - `style.css` – styles for catalogue cards
 - `script.js` – JavaScript fetching records from AirTable
-- `catalogue-widget.html` – self‑contained snippet with HTML, CSS and JS
 
-To test locally, open `widget/index.html` in a browser. On WordPress, you can either copy the separate files or use `catalogue-widget.html` to paste a single block containing everything in one file.
+A self-contained `catalogue-widget.html` is provided at the repository root for easy copy-paste into WordPress.
+
+To test locally, open `widget/index.html` in a browser. On WordPress, you can copy the HTML, CSS, and JS into a custom widget or plugin.
