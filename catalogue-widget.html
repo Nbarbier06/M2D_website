@@ -7,16 +7,21 @@
     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
 
     :root {
-      --md-green: #2E7D32;
-      --md-green-light: #C8E6C9;
-      --md-gray-light: #F5F5F5;
-      --md-gray-dark: #616161;
+      /* Couleurs inspirées de la charte Move2Digital */
+      --md-green: #0057B8;
+      --md-green-light: #D5E6F9;
+      --md-gray-light: #F5F7FA;
+      --md-gray-dark: #374151;
       --surface: #FFFFFF;
       --shadow: rgba(0,0,0,0.1);
-      --pill-bg: #E0E0E0;
+      --pill-bg: #E8F0FE;
     }
     * { box-sizing:border-box; margin:0; padding:0; font-family:'Roboto',sans-serif; }
-    body { background:var(--md-gray-light); color:var(--md-gray-dark); }
+    body {
+      background:var(--md-gray-light);
+      color:var(--md-gray-dark);
+      line-height:1.5;
+    }
 
     /* ==== CONTROLES HAUT ==== */
     .controls {
@@ -31,35 +36,48 @@
     }
     .search-bar input {
       width:100%; padding:.75rem 1rem;
-      border:1px solid var(--md-green);
-      border-radius:999px;
+      border:1px solid var(--md-green-light);
+      border-radius:8px;
       font-size:.95rem;
       background:var(--surface);
       color:var(--md-gray-dark);
+      box-shadow:0 1px 2px var(--shadow) inset;
+    }
+    .search-bar input::placeholder {
+      color:var(--md-gray-dark);
+      opacity:0.6;
     }
     .filters {
       display:flex; gap:1rem;
     }
     .dropdown {
       position:relative;
+      min-width:220px;
     }
     .dropdown button {
       padding:.5rem 1rem;
+      width:100%;
       border:1px solid var(--md-green);
       border-radius:6px;
       background:var(--surface);
+      color:var(--md-green);
       cursor:pointer;
       font-size:.9rem;
+      transition:background .2s,color .2s;
     }
-    .dropdown.open>button { background:var(--md-green-light); }
+    .dropdown.open>button {
+      background:var(--md-green);
+      color:#fff;
+      border-color:var(--md-green);
+    }
     .dropdown-content {
       display:none;
       position:absolute; top:110%; left:0; right:0;
       background:var(--surface);
       border:1px solid var(--md-green-light);
-      border-radius:6px;
+      border-radius:8px;
       max-height:180px; overflow:auto;
-      box-shadow:0 2px 4px var(--shadow);
+      box-shadow:0 2px 6px var(--shadow);
       z-index:10;
     }
     .dropdown.open .dropdown-content { display:block; }
@@ -85,6 +103,7 @@
     .card {
       background:var(--surface);
       border-radius:12px;
+      border:1px solid var(--md-green-light);
       box-shadow:0 1px 4px var(--shadow);
       display:flex; flex-direction:column;
       transition:transform .2s,box-shadow .2s;
@@ -95,7 +114,8 @@
     }
     .card-header {
       display:flex; align-items:center; padding:1rem;
-      background:var(--md-green); color:#fff;
+      background:linear-gradient(135deg, var(--md-green) 0%, #004999 100%);
+      color:#fff;
       border-top-left-radius:12px; border-top-right-radius:12px;
     }
     .card-header img {
@@ -124,7 +144,7 @@
     }
     .card-tags .tag {
       background:var(--pill-bg);
-      color:var(--md-gray-dark);
+      color:var(--md-green);
       padding:.25rem .5rem;
       border-radius:999px;
       font-size:.75rem;
@@ -141,9 +161,11 @@
       background:var(--md-green-light);
       color:var(--md-green);
       cursor:pointer;
+      transition:background .2s,color .2s;
     }
     .card-footer button:hover {
-      background:var(--md-green); color:#fff;
+      background:var(--md-green);
+      color:#fff;
     }
 
     /* ==== MODAL ==== */
@@ -165,7 +187,8 @@
       box-shadow:0 4px 12px var(--shadow);
     }
     .modal-header {
-      background:var(--md-green); color:#fff;
+      background:linear-gradient(135deg, var(--md-green) 0%, #004999 100%);
+      color:#fff;
       text-align:center; padding:1.5rem;
       position:relative;
     }
@@ -198,17 +221,24 @@
       text-align:right; padding:1rem 1.5rem 1.5rem;
     }
     .modal-footer a {
+      display:inline-block;
       padding:.5rem 1rem;
       background:var(--md-green-light);
       color:var(--md-green);
       border-radius:6px;
       text-decoration:none;
       font-weight:500;
+      transition:background .2s,color .2s;
+    }
+    .modal-footer a:hover {
+      background:var(--md-green);
+      color:#fff;
     }
 
     @media(max-width:800px) {
       .controls { flex-direction:column; align-items:stretch; }
       .filters { flex-direction:column; }
+      .dropdown { width:100%; }
       .catalogue { grid-template-columns:1fr; }
       .dropdown-content { position:static; max-height:120px; }
       .modal-content { grid-template-columns:1fr; }
@@ -273,7 +303,14 @@
         lbl.querySelector('input').addEventListener('change', applyFilters);
         cont.appendChild(lbl);
       });
-      dd.querySelector('button').onclick = () => dd.classList.toggle('open');
+      const btn = dd.querySelector('button');
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        document.querySelectorAll('.dropdown.open').forEach(d => {
+          if(d !== dd) d.classList.remove('open');
+        });
+        dd.classList.toggle('open');
+      };
     }
 
     function applyFilters() {
@@ -292,7 +329,7 @@
       catalogue.innerHTML = '';
       filtered.forEach((r,i)=>{
         const card = document.createElement('div'); card.className='card';
-        const logo = r.logo || 'generic-logo.png';
+        const logo = r.logo || 'https://move2digital.eu/wp-content/uploads/2025/04/20944356.jpg';
         const tagsHtml = r.tags.map(t=>`<span class="tag">${t}</span>`).join('');
         card.innerHTML = `
           <div class="card-header"><img src="${logo}" alt="Logo"><h3>${r.name}</h3></div>
@@ -304,7 +341,7 @@
     }
 
     function openModal(r) {
-      document.getElementById('modal-logo').src = r.logo || 'generic-logo.png';
+      document.getElementById('modal-logo').src = r.logo || 'https://move2digital.eu/wp-content/uploads/2025/04/20944356.jpg';
       document.getElementById('modal-title').textContent = r.name;
       document.getElementById('modal-desc').textContent  = r.desc;
       document.getElementById('modal-usage').textContent = r.usage.join(', ');
@@ -314,12 +351,23 @@
       document.getElementById('modal-email').innerHTML = `<strong>Email :</strong> ${r.email}`;
       document.getElementById('modal-phone').innerHTML = `<strong>Tél. :</strong> ${r.phone}`;
       const link = document.getElementById('modal-link');
-      link.href = r.site.startsWith('http')? r.site:'https://'+r.site;
+      if(r.site) {
+        link.href = r.site.startsWith('http') ? r.site : 'https://' + r.site;
+        link.style.display = 'inline-block';
+      } else {
+        link.style.display = 'none';
+      }
       document.getElementById('modal').classList.add('active');
     }
 
     document.querySelector('.modal-close').onclick = ()=>document.getElementById('modal').classList.remove('active');
     document.getElementById('modal').onclick = e=>{ if(e.target.id==='modal') e.target.classList.remove('active'); };
+
+    document.addEventListener('click', e=>{
+      document.querySelectorAll('.dropdown.open').forEach(d=>{
+        if(!d.contains(e.target)) d.classList.remove('open');
+      });
+    });
 
     document.addEventListener('DOMContentLoaded', async()=>{
       searchIn.oninput = applyFilters;
