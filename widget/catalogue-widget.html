@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Catalogue IA - Widget</title>
+  <style>
+    .catalogue {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+      padding: 1rem;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 1rem;
+      transition: transform 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .card-title {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+    .card-description {
+      font-size: 0.9rem;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div id="catalogue-ia" class="catalogue"></div>
+  <script>
+    const API_KEY = "pat7UP069eYy2CH9u.23212cef80da585a3bc0fb9bb572162a0e4fd2cabdd0bbb4955a3022e833da07";
+    const BASE_ID = "app7913ETHqajipme";
+    const TABLE_NAME = "solutionsIA";
+    const url = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}?pageSize=100`;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const container = document.getElementById('catalogue-ia');
+      try {
+        const response = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${API_KEY}`
+          }
+        });
+        const data = await response.json();
+
+        data.records.forEach(record => {
+          const { Nom, Description } = record.fields;
+          const card = document.createElement('div');
+          card.classList.add('card');
+          card.innerHTML = `
+            <h3 class="card-title">${Nom || ''}</h3>
+            <p class="card-description">${Description || ''}</p>
+          `;
+          container.appendChild(card);
+        });
+      } catch (err) {
+        console.error('Erreur lors de la récupération des données AirTable :', err);
+        container.innerHTML = '<p>Erreur lors du chargement des données.</p>';
+      }
+    });
+  </script>
+</body>
+</html>
