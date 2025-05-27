@@ -1,195 +1,350 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Catalogue Solutions IA</title>
-  <!-- Widget: AI Solution Catalog -->
+  <meta charset="utf-8">
+  <title>Catalogue IA — Move2Digital</title>
   <style>
-    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap");
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
 
     :root {
-      --primary: #004c97;
-      --primary-dark: #003973;
-      --bg: #f9fafb;
-      --text: #1e293b;
-      --card-bg: #ffffff;
-      --tag-bg: #e0f2fe;
-      --tag-color: #0369a1;
-      font-family: "Inter", sans-serif;
+      --md-green: #2E7D32;
+      --md-green-light: #C8E6C9;
+      --md-gray-light: #F5F5F5;
+      --md-gray-dark: #616161;
+      --surface: #FFFFFF;
+      --shadow: rgba(0,0,0,0.1);
+      --pill-bg: #E0E0E0;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; font-family:'Roboto',sans-serif; }
+    body { background:var(--md-gray-light); color:var(--md-gray-dark); }
+
+    /* ==== CONTROLES HAUT ==== */
+    .controls {
+      max-width:1200px;
+      margin:1rem auto;
+      display:flex; flex-wrap:wrap; gap:1rem;
+      align-items:flex-end;
+      padding:0 1rem;
+    }
+    .search-bar {
+      flex:1;
+    }
+    .search-bar input {
+      width:100%; padding:.75rem 1rem;
+      border:1px solid var(--md-green);
+      border-radius:999px;
+      font-size:.95rem;
+      background:var(--surface);
+      color:var(--md-gray-dark);
+    }
+    .filters {
+      display:flex; gap:1rem;
+    }
+    .dropdown {
+      position:relative;
+    }
+    .dropdown button {
+      padding:.5rem 1rem;
+      border:1px solid var(--md-green);
+      border-radius:6px;
+      background:var(--surface);
+      cursor:pointer;
+      font-size:.9rem;
+    }
+    .dropdown.open>button { background:var(--md-green-light); }
+    .dropdown-content {
+      display:none;
+      position:absolute; top:110%; left:0; right:0;
+      background:var(--surface);
+      border:1px solid var(--md-green-light);
+      border-radius:6px;
+      max-height:180px; overflow:auto;
+      box-shadow:0 2px 4px var(--shadow);
+      z-index:10;
+    }
+    .dropdown.open .dropdown-content { display:block; }
+    .dropdown-content label {
+      display:flex; align-items:center;
+      padding:.4rem .75rem;
+      font-size:.9rem;
+      cursor:pointer;
+    }
+    .dropdown-content input { margin-right:.5rem; }
+
+    /* ==== GRID ==== */
+    .catalogue {
+      max-width:1200px;
+      margin:0 auto 2rem;
+      padding:0 1rem;
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+      gap:1rem;
     }
 
-    body { background: var(--bg); margin: 0; }
-
-    /* Container */
-    #catalogue-ia {
-      max-width: 1200px;
-      margin: 40px auto;
-      padding: 1rem;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
-    }
-
-    /* Card */
+    /* ==== CARD ==== */
     .card {
-      background: var(--card-bg);
-      border-radius: 0.5rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.2s ease;
-      cursor: pointer;
+      background:var(--surface);
+      border-radius:12px;
+      box-shadow:0 1px 4px var(--shadow);
+      display:flex; flex-direction:column;
+      transition:transform .2s,box-shadow .2s;
     }
-    .card:hover { transform: translateY(-4px); }
-    .card img {
-      width: 100%;
-      height: 160px;
-      object-fit: cover;
+    .card:hover {
+      transform:translateY(-4px);
+      box-shadow:0 4px 12px var(--shadow);
     }
+    .card-header {
+      display:flex; align-items:center; padding:1rem;
+      background:var(--md-green); color:#fff;
+      border-top-left-radius:12px; border-top-right-radius:12px;
+    }
+    .card-header img {
+      width:56px; height:56px;
+      object-fit:contain;
+      border-radius:8px;
+      background:var(--surface);
+      margin-right:1rem;
+    }
+    .card-header h3 { font-size:1.1rem; margin:0; }
     .card-body {
-      padding: 1rem;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
+      padding:0 1rem 1rem;
+      flex-grow:1;
+      display:flex; flex-direction:column;
     }
-    .card-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: var(--text);
+    .card-body p {
+      font-size:.85rem; line-height:1.2;
+      margin:.75rem 0;
+      display:-webkit-box; -webkit-line-clamp:4;
+      -webkit-box-orient:vertical; overflow:hidden;
+      color:var(--md-gray-dark);
     }
-    .card-desc {
-      font-size: 0.95rem;
-      color: #555;
-      margin-bottom: 0.75rem;
-      flex: 1;
+    .card-tags {
+      display:flex; flex-wrap:wrap; gap:.4rem;
+      margin-bottom:.75rem;
     }
-    .tag-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: auto;
+    .card-tags .tag {
+      background:var(--pill-bg);
+      color:var(--md-gray-dark);
+      padding:.25rem .5rem;
+      border-radius:999px;
+      font-size:.75rem;
     }
-    .tag {
-      background: var(--tag-bg);
-      color: var(--tag-color);
-      border-radius: 9999px;
-      padding: 0.25rem 0.5rem;
-      font-size: 0.75rem;
-      white-space: nowrap;
+    .card-footer {
+      padding:0 1rem 1rem;
+      display:flex; justify-content:flex-end;
+    }
+    .card-footer button {
+      padding:.25rem .6rem;
+      font-size:.8rem;
+      border:1px solid var(--md-green);
+      border-radius:6px;
+      background:var(--md-green-light);
+      color:var(--md-green);
+      cursor:pointer;
+    }
+    .card-footer button:hover {
+      background:var(--md-green); color:#fff;
     }
 
-    /* Modal */
+    /* ==== MODAL ==== */
     .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.4);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
+      position:fixed; inset:0;
+      background:rgba(0,0,0,0.3);
+      display:flex; align-items:center; justify-content:center;
+      opacity:0; pointer-events:none;
+      transition:opacity .3s;
     }
-    .modal-overlay.show { animation: fadeIn 0.3s forwards; display: flex; }
-
-    @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
-
+    .modal-overlay.active {
+      opacity:1; pointer-events:all;
+    }
     .modal {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-      max-width: 700px;
-      width: 90%;
-      padding: 2rem 1.5rem;
-      position: relative;
-      max-height: 90vh;
-      overflow-y: auto;
-      transform: scale(0.95);
-      transition: transform 0.3s ease;
+      background:var(--surface);
+      width:90%; max-width:600px;
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow:0 4px 12px var(--shadow);
     }
-    .modal-overlay.show .modal { transform: scale(1); }
+    .modal-header {
+      background:var(--md-green); color:#fff;
+      text-align:center; padding:1.5rem;
+      position:relative;
+    }
+    .modal-header img {
+      width:120px; height:120px;
+      object-fit:contain;
+      border-radius:12px;
+      background:var(--surface);
+      margin-bottom:1rem;
+    }
+    .modal-header h2 { margin:0; font-size:1.5rem; }
+    .modal-close {
+      position:absolute; top:.5rem; right:.5rem;
+      background:none; border:none; font-size:1.5rem;
+      color:#fff; cursor:pointer;
+    }
+    .modal-content {
+      padding:1.5rem;
+      display:grid; grid-template-columns:1fr 1fr; gap:1rem;
+    }
+    .modal-section h3 {
+      font-size:1rem; color:var(--md-green);
+      margin-bottom:.5rem;
+    }
+    .modal-section p, .modal-section ul {
+      margin-left:.5rem; margin-bottom:.75rem;
+      font-size:.9rem; color:var(--md-gray-dark);
+    }
+    .modal-footer {
+      text-align:right; padding:1rem 1.5rem 1.5rem;
+    }
+    .modal-footer a {
+      padding:.5rem 1rem;
+      background:var(--md-green-light);
+      color:var(--md-green);
+      border-radius:6px;
+      text-decoration:none;
+      font-weight:500;
+    }
 
-    .modal .close-btn {
-      position: absolute;
-      top: 8px;
-      right: 12px;
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      color: var(--text);
-      cursor: pointer;
+    @media(max-width:800px) {
+      .controls { flex-direction:column; align-items:stretch; }
+      .filters { flex-direction:column; }
+      .catalogue { grid-template-columns:1fr; }
+      .dropdown-content { position:static; max-height:120px; }
+      .modal-content { grid-template-columns:1fr; }
     }
   </style>
 </head>
 <body>
-  <div id="catalogue-ia"></div>
 
-  <div id="modalContainer" class="modal-overlay" role="dialog" aria-modal="true">
+  <!-- CONTROLS TOP -->
+  <div class="controls">
+    <div class="search-bar">
+      <input id="search" type="text" placeholder="Rechercher…">
+    </div>
+    <div class="filters">
+      <div class="dropdown" id="dd-usage">
+        <button>Usage ▾</button>
+        <div class="dropdown-content"></div>
+      </div>
+      <div class="dropdown" id="dd-tech">
+        <button>Technologie ▾</button>
+        <div class="dropdown-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATALOG -->
+  <div id="catalogue" class="catalogue"></div>
+
+  <!-- MODAL -->
+  <div id="modal" class="modal-overlay">
     <div class="modal">
-      <button class="close-btn" onclick="closeModal()" aria-label="Fermer">&times;</button>
-      <div id="modalDetails"></div>
+      <div class="modal-header">
+        <button class="modal-close">&times;</button>
+        <img id="modal-logo" src="" alt="Logo">
+        <h2 id="modal-title"></h2>
+      </div>
+      <div class="modal-content">
+        <div class="modal-section"><h3>Aperçu</h3><p id="modal-desc"></p></div>
+        <div class="modal-section"><h3>Catégories</h3><p><strong>Usage :</strong> <span id="modal-usage"></span></p><p><strong>Techno :</strong> <span id="modal-tech"></span></p></div>
+        <div class="modal-section"><h3>Secteurs</h3><p id="modal-sectors"></p></div>
+        <div class="modal-section"><h3>Contact</h3><p id="modal-site"></p><p id="modal-email"></p><p id="modal-phone"></p></div>
+      </div>
+      <div class="modal-footer"><a id="modal-link" href="#" target="_blank">Visiter le site</a></div>
     </div>
   </div>
 
   <script>
     const API_KEY = "pat7UP069eYy2CH9u.23212cef80da585a3bc0fb9bb572162a0e4fd2cabdd0bbb4955a3022e833da07";
-    const BASE_ID = "app7913ETHqajipme";
-    const TABLE_NAME = "solutionsIA";
-    const url = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}?pageSize=100`;
+    const URL     = `https://api.airtable.com/v0/app7913ETHqajipme/solutionsIA?pageSize=100`;
 
-    document.addEventListener('DOMContentLoaded', async () => {
-      const container = document.getElementById('catalogue-ia');
+    let records = [], filtered = [];
+    const catalogue = document.getElementById('catalogue');
+    const searchIn  = document.getElementById('search');
+    const ddUsage   = document.getElementById('dd-usage');
+    const ddTech    = document.getElementById('dd-tech');
+
+    function buildDropdown(dd, items) {
+      const cont = dd.querySelector('.dropdown-content'); cont.innerHTML = '';
+      items.forEach(i => {
+        const lbl = document.createElement('label');
+        lbl.innerHTML = `<input type="checkbox" value="${i}"> ${i}`;
+        lbl.querySelector('input').addEventListener('change', applyFilters);
+        cont.appendChild(lbl);
+      });
+      dd.querySelector('button').onclick = () => dd.classList.toggle('open');
+    }
+
+    function applyFilters() {
+      const term = searchIn.value.toLowerCase();
+      const selU = Array.from(ddUsage.querySelectorAll('input:checked')).map(i=>i.value);
+      const selT = Array.from(ddTech.querySelectorAll('input:checked')).map(i=>i.value);
+      filtered = records.filter(r => {
+        if(term && !(`${r.name} ${r.desc}`.toLowerCase().includes(term))) return false;
+        if(selU.length && !selU.some(u=>r.usage.includes(u))) return false;
+        if(selT.length && !selT.some(t=>r.tech.includes(t))) return false;
+        return true;
+      }); renderCards();
+    }
+
+    function renderCards() {
+      catalogue.innerHTML = '';
+      filtered.forEach((r,i)=>{
+        const card = document.createElement('div'); card.className='card';
+        const logo = r.logo || 'generic-logo.png';
+        const tagsHtml = r.tags.map(t=>`<span class="tag">${t}</span>`).join('');
+        card.innerHTML = `
+          <div class="card-header"><img src="${logo}" alt="Logo"><h3>${r.name}</h3></div>
+          <div class="card-body"><p>${r.desc}</p><div class="card-tags">${tagsHtml}</div></div>
+          <div class="card-footer"><button data-idx="${i}">En savoir plus</button></div>`;
+        card.querySelector('button').onclick = ()=>openModal(r);
+        catalogue.appendChild(card);
+      });
+    }
+
+    function openModal(r) {
+      document.getElementById('modal-logo').src = r.logo || 'generic-logo.png';
+      document.getElementById('modal-title').textContent = r.name;
+      document.getElementById('modal-desc').textContent  = r.desc;
+      document.getElementById('modal-usage').textContent = r.usage.join(', ');
+      document.getElementById('modal-tech').textContent  = r.tech.join(', ');
+      document.getElementById('modal-sectors').textContent = r.sectors.join(', ');
+      document.getElementById('modal-site').innerHTML  = `<strong>Site :</strong> ${r.site}`;
+      document.getElementById('modal-email').innerHTML = `<strong>Email :</strong> ${r.email}`;
+      document.getElementById('modal-phone').innerHTML = `<strong>Tél. :</strong> ${r.phone}`;
+      const link = document.getElementById('modal-link');
+      link.href = r.site.startsWith('http')? r.site:'https://'+r.site;
+      document.getElementById('modal').classList.add('active');
+    }
+
+    document.querySelector('.modal-close').onclick = ()=>document.getElementById('modal').classList.remove('active');
+    document.getElementById('modal').onclick = e=>{ if(e.target.id==='modal') e.target.classList.remove('active'); };
+
+    document.addEventListener('DOMContentLoaded', async()=>{
+      searchIn.oninput = applyFilters;
       try {
-        const response = await fetch(url, { headers: { Authorization: `Bearer ${API_KEY}` } });
-        const data = await response.json();
-
-        data.records.forEach(record => {
-          const { Nom, Description, Logo, Features = [], Sectors = [] } = record.fields;
-          const card = document.createElement('div');
-          card.className = 'card';
-
-          const img = document.createElement('img');
-          img.src = Logo?.[0]?.url || 'placeholder.jpg';
-          img.alt = Nom || '';
-          card.appendChild(img);
-
-          const body = document.createElement('div');
-          body.className = 'card-body';
-          body.innerHTML = `<h3 class="card-title">${Nom || ''}</h3><p class="card-desc">${Description || ''}</p>`;
-
-          const tags = document.createElement('div');
-          tags.className = 'tag-list';
-          Features.concat(Sectors).forEach(t => {
-            const span = document.createElement('span');
-            span.className = 'tag';
-            span.textContent = t;
-            tags.appendChild(span);
-          });
-          body.appendChild(tags);
-          card.appendChild(body);
-
-          card.addEventListener('click', () => {
-            openModal(`<h2>${Nom || ''}</h2><p>${Description || ''}</p>`);
-          });
-
-          container.appendChild(card);
-        });
-      } catch (err) {
-        console.error('Erreur lors de la récupération des données AirTable :', err);
-        container.innerHTML = '<p>Erreur lors du chargement des données.</p>';
+        const resp = await fetch(URL, { headers:{Authorization:`Bearer ${API_KEY}`} });
+        const data = await resp.json();
+        const setU = new Set(), setT = new Set();
+        records = data.records.map(r=>{ const f=r.fields; const rec={
+          name: f["Nom de l'entreprise"].trim(),
+          desc: f["Descriptif"].trim(),
+          usage: f["Catégorie d'usage"]||[],
+          tech: f["Catégorie technologique"]||[],
+          sectors: f["Secteur d'activité"]||[],
+          logo: f["Logo"]?.[0]?.url||'',
+          site: f["Site"]||'', email: f["Email"]||'', phone: f["Contact"]||'' };
+        rec.tags=[...rec.usage,...rec.tech,...rec.sectors];
+        rec.usage.forEach(u=>setU.add(u)); rec.tech.forEach(t=>setT.add(t)); return rec; });
+        buildDropdown(ddUsage,[...setU].sort());
+        buildDropdown(ddTech,[...setT].sort());
+        filtered=[...records]; renderCards();
+      } catch(err) {
+        console.error(err);
+        catalogue.innerHTML=`<p style="text-align:center;color:var(--md-gray-dark)">Erreur de chargement.</p>`;
       }
     });
-
-    function openModal(content) {
-      document.getElementById('modalDetails').innerHTML = content;
-      const overlay = document.getElementById('modalContainer');
-      overlay.classList.add('show');
-    }
-    function closeModal() {
-      const overlay = document.getElementById('modalContainer');
-      overlay.classList.remove('show');
-    }
   </script>
 </body>
 </html>
