@@ -27,13 +27,12 @@
     .controls {
       max-width:1200px;
       margin:1rem auto;
-      display:flex; flex-wrap:wrap; gap:1rem;
-      align-items:flex-end;
+      display:flex;
+      flex-direction:column;
+      gap:.75rem;
       padding:0 1rem;
     }
-    .search-bar {
-      flex:1;
-    }
+    .search-bar { flex:1; }
     .search-bar input {
       width:100%; padding:.75rem 1rem;
       border:1px solid var(--md-green-light);
@@ -48,19 +47,19 @@
       opacity:0.6;
     }
     .filters {
-      display:flex; gap:1rem;
+      display:flex; gap:1rem; flex-wrap:wrap;
     }
     .dropdown {
       position:relative;
     }
     .dropdown button {
-      padding:.5rem 1rem;
+      padding:.6rem 1.2rem;
       border:1px solid var(--md-green);
       border-radius:6px;
       background:var(--surface);
       color:var(--md-green);
       cursor:pointer;
-      font-size:.9rem;
+      font-size:1rem;
       transition:background .2s,color .2s;
     }
     .dropdown.open>button {
@@ -86,6 +85,21 @@
       cursor:pointer;
     }
     .dropdown-content input { margin-right:.5rem; }
+
+    #reset {
+      padding:.6rem 1.2rem;
+      border:1px solid var(--md-green);
+      border-radius:6px;
+      background:var(--md-green-light);
+      color:var(--md-green);
+      cursor:pointer;
+      font-size:1rem;
+      transition:background .2s,color .2s;
+    }
+    #reset:hover {
+      background:var(--md-green);
+      color:#fff;
+    }
 
     /* ==== GRID ==== */
     .catalogue {
@@ -130,9 +144,9 @@
       display:flex; flex-direction:column;
     }
     .card-body p {
-      font-size:.85rem; line-height:1.2;
-      margin:.75rem 0;
-      display:-webkit-box; -webkit-line-clamp:4;
+      font-size:.95rem; line-height:1.3;
+      margin:.75rem 0 1rem;
+      display:-webkit-box; -webkit-line-clamp:5;
       -webkit-box-orient:vertical; overflow:hidden;
       color:var(--md-gray-dark);
     }
@@ -180,8 +194,9 @@
     .modal {
       background:var(--surface);
       width:90%; max-width:600px;
+      max-height:calc(100vh - 4rem);
       border-radius:12px;
-      overflow:hidden;
+      overflow:auto;
       box-shadow:0 4px 12px var(--shadow);
     }
     .modal-header {
@@ -232,6 +247,20 @@
       color:#fff;
     }
 
+    .pagination {
+      display:flex; justify-content:center; gap:.5rem;
+      margin-bottom:2rem;
+    }
+    .pagination button {
+      padding:.4rem .8rem;
+      border:1px solid var(--md-green);
+      border-radius:6px;
+      background:var(--surface);
+      color:var(--md-green);
+      cursor:pointer;
+    }
+    .pagination button.active { background:var(--md-green); color:#fff; }
+
     @media(max-width:800px) {
       .controls { flex-direction:column; align-items:stretch; }
       .filters { flex-direction:column; }
@@ -257,11 +286,13 @@
         <button>Technologie ▾</button>
         <div class="dropdown-content"></div>
       </div>
+      <button id="reset">Reset</button>
     </div>
   </div>
 
   <!-- CATALOG -->
   <div id="catalogue" class="catalogue"></div>
+  <div id="pagination" class="pagination"></div>
 
   <!-- MODAL -->
   <div id="modal" class="modal-overlay">
@@ -286,7 +317,10 @@
     const URL     = `https://api.airtable.com/v0/app7913ETHqajipme/solutionsIA?pageSize=100`;
 
     let records = [], filtered = [];
+    let currentPage = 1;
+    const perPage   = 9;
     const catalogue = document.getElementById('catalogue');
+    const pagination = document.getElementById('pagination');
     const searchIn  = document.getElementById('search');
     const ddUsage   = document.getElementById('dd-usage');
     const ddTech    = document.getElementById('dd-tech');
@@ -310,6 +344,7 @@
     }
 
     function applyFilters() {
+      currentPage = 1;
       const term = searchIn.value.toLowerCase();
       const selU = Array.from(ddUsage.querySelectorAll('input:checked')).map(i=>i.value);
       const selT = Array.from(ddTech.querySelectorAll('input:checked')).map(i=>i.value);
@@ -323,17 +358,33 @@
 
     function renderCards() {
       catalogue.innerHTML = '';
-      filtered.forEach((r,i)=>{
+      const start = (currentPage - 1) * perPage;
+      const items = filtered.slice(start, start + perPage);
+      items.forEach((r,i)=>{
         const card = document.createElement('div'); card.className='card';
         const logo = r.logo || 'generic-logo.png';
-        const tagsHtml = r.tags.map(t=>`<span class="tag">${t}</span>`).join('');
+        const tagsHtml = r.tags.slice(0,4).map(t=>`<span class="tag">${t}</span>`).join('');
         card.innerHTML = `
           <div class="card-header"><img src="${logo}" alt="Logo"><h3>${r.name}</h3></div>
           <div class="card-body"><p>${r.desc}</p><div class="card-tags">${tagsHtml}</div></div>
-          <div class="card-footer"><button data-idx="${i}">En savoir plus</button></div>`;
+          <div class="card-footer"><button data-idx="${i + start}">En savoir plus</button></div>`;
         card.querySelector('button').onclick = ()=>openModal(r);
         catalogue.appendChild(card);
       });
+      renderPagination();
+    }
+
+    function renderPagination() {
+      const pages = Math.ceil(filtered.length / perPage);
+      pagination.innerHTML = '';
+      if(pages <= 1) return;
+      for(let p=1; p<=pages; p++) {
+        const b = document.createElement('button');
+        b.textContent = p;
+        if(p === currentPage) b.classList.add('active');
+        b.onclick = () => { currentPage = p; renderCards(); };
+        pagination.appendChild(b);
+      }
     }
 
     function openModal(r) {
@@ -362,6 +413,12 @@
 
     document.addEventListener('DOMContentLoaded', async()=>{
       searchIn.oninput = applyFilters;
+      document.getElementById('reset').onclick = () => {
+        searchIn.value = '';
+        ddUsage.querySelectorAll('input:checked').forEach(c=>c.checked=false);
+        ddTech.querySelectorAll('input:checked').forEach(c=>c.checked=false);
+        applyFilters();
+      };
       try {
         const resp = await fetch(URL, { headers:{Authorization:`Bearer ${API_KEY}`} });
         const data = await resp.json();
